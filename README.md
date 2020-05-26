@@ -14,3 +14,13 @@ This is an android application which solves 4 basic problems that every smartpho
 
 <b>Problem 4:</b> Want to lock your phone?<br>
 <b>Solution 4:</b> MyHelper will help you lock your screen immediately
+
+<b>Hardware Requirements<b>
+```
+RAM - 2GB
+Disk Space - 40 MB
+```
+<b>Software Requirements<b>
+```
+Supporting Operating Systems: Android (5.1.1 or above)
+```
