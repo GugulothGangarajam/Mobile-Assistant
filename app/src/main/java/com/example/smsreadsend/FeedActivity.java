@@ -1,13 +1,12 @@
 package com.example.smsreadsend;
 
 import android.os.Vibrator;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
-import android.widget.TextView;
 
 public class FeedActivity extends AppCompatActivity {
 

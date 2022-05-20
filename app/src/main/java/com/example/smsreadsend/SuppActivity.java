@@ -3,7 +3,7 @@ package com.example.smsreadsend;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Vibrator;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +26,7 @@ public class SuppActivity extends AppCompatActivity {
             public void onClick(View v) {
                 vibr(v);
                 Intent call = new Intent(Intent.ACTION_DIAL);
-                call.setData(Uri.parse("tel:"+"09110319657"));
+                call.setData(Uri.parse("tel:"+"+919492138572"));
                 startActivity(call);
             }
         });
@@ -36,7 +36,7 @@ public class SuppActivity extends AppCompatActivity {
             public void onClick(View v) {
                 vibr(v);
                 Intent email = new Intent(Intent.ACTION_SENDTO);
-                email.setData(Uri.parse("mailto:pavankalyaninugurthi@gmail.com"));
+                email.setData(Uri.parse("mailto:mobileassistant2022@gmail.com"));
                 startActivity(email);
             }
         });

@@ -14,7 +14,7 @@ public class SMSReciever extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Bundle bundle=intent.getExtras();
 
-        if(intent.getAction().equalsIgnoreCase("android provider.Telephony.SMS_RECIEVED")){
+        if(intent.getAction().equalsIgnoreCase("android provider.Telephony.SMS_RECEIVED")){
             if(bundle!=null){
                 Object[] sms=(Object[]) bundle.get(SMS_BUNDLE);
                 String smsMsg="";

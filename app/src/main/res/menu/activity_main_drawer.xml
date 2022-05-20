@@ -20,7 +20,7 @@
     <item
                 android:id="@+id/nav_about"
                 android:icon="@drawable/ic_add_circle_black_24dp"
-                android:title="About My Helper" />
+                android:title="About Mobile_Assistant" />
 
 
 </menu>

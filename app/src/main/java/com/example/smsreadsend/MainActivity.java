@@ -1,6 +1,7 @@
 package com.example.smsreadsend;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -14,29 +15,24 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.AudioManager;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,9 +43,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -217,33 +213,40 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         String phoneNum = etPhoneNum.getText().toString().trim();
         if(!etMessage.getText().toString().equals("") || !etPhoneNum.getText().toString().equals("")) {
             SmsManager smsMan = SmsManager.getDefault();
-            //smsMan.sendTextMessage(phoneNum, null ,msg , null, null);
+            smsMan.sendTextMessage(phoneNum, null ,msg , null, null);
             Toast.makeText(MainActivity.this, "SMS Sent to " + phoneNum, Toast.LENGTH_LONG).show();
         }
     }
 
     public String readContact(String cname){
-
+            cname=cname.toLowerCase();
+            String res="";
         if(checkPermission(Manifest.permission.READ_CONTACTS)){
             ContentResolver resolver=getContentResolver();
             Cursor cursor=resolver.query(ContactsContract.Contacts.CONTENT_URI,null,null,null,null);
             while(cursor.moveToNext()){
-                String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-                String name=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-
+                @SuppressLint("Range") String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+                @SuppressLint("Range") String name=cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+                    name=name.toLowerCase();
                 Cursor phoneCursor=resolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,null,
                         ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", new String[]{id}, null);
 
+                    int t=0;
+                while (phoneCursor.moveToNext() ) {
+                    @SuppressLint("Range") String phoneNumber=phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
 
-                while (phoneCursor.moveToNext() && name.contains(cname)) {
-                    String phoneNumber=phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    notif1("Contact","Contact has succesfully been sent");
-                    return phoneNumber;
+                    if(name.contains(cname)  /*&& t<1*/) {
+                        notif1("Contact","Contact has successfully been sent");
+                       // res = "\n"+name+"-->"+phoneNumber;
+                        return name + "-->" + phoneNumber;
+                       // t++;
+                    }
                 }
+
             }
         }
         notif1("Contact","Requested Contact not found");
-        return "Not Found";
+        return  cname +"Not Found";
     }
 
     public void refreshInbox(){
@@ -260,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         getPwd();
         boolean active = devicePolicyManager.isAdminActive(componentName);
 
-        if (rmsg.contains(password+"C")) {
+        if (rmsg.contains(password+" CONTACT")) {
             ps=1;
         }
         else if (rmsg.contains(password+" LOCATION")) {
@@ -282,12 +285,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
         {
             case 1:
                 //Contact
-                rmsg = rmsg.replace(password+"C ", "");
+                String cname = rmsg.substring((password.length()+9),rmsg.length());
                 if(pvs==1 && pvsnm.equals(rmsg)){  break;}
                 else {
-                    pvsnm=rmsg;
+                    pvsnm=cname;
                     etPhoneNum.setText(rphno);
-                    String phoneNu = readContact(rmsg);
+                    String phoneNu = readContact(cname);
                     etMessage.setText(phoneNu);
                     sendSMS();
                 }
@@ -310,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 onLocationChanged(location);
                 etPhoneNum.setText(rphno);
                 sendSMS();
-                    notif2("Location","Location has succesfully been sent");
+                    notif2("Location","Location has successfully been sent");
                 }
                 break;
 
@@ -318,8 +321,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 //Lock
                 if(pvs==3){break;}
                 if (active) {
-                    notif3("Lock","Device has been locked by MyHelper");
+                    notif3("Lock","Device has been locked by Mobile_Assistant");
                     devicePolicyManager.lockNow();
+                    onLock();
+
+
                 } else {
                     Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
                     intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, componentName);
@@ -332,18 +338,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
                 //Vibrate
                 if(pvs==4){break;}
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+                onvibrate();
+
                 break;
 
             case 5:
                 //Silent
                 if(pvs==5){break;}
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+
                 break;
 
             case 6:
                 //Normal
                 if(pvs==6){break;}
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                normal();
                 break;
             default:
                 //No default;
@@ -351,6 +361,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         pvs=ps;
 
+    }
+
+    private void onLock() {
+        etPhoneNum.setText(rphno);
+        etMessage.setText("your device is set to Locked");
+        sendSMS();
+    }
+
+    private void onvibrate() {
+        etPhoneNum.setText(rphno);
+        etMessage.setText("your device is set to Silent mode");
+        sendSMS();
+    }
+
+    private void normal() {
+        etPhoneNum.setText(rphno);
+        etMessage.setText("your device is set to Normal mode");
+        sendSMS();
     }
 
     public void updateList(final String smsMsg){
@@ -363,7 +391,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
 
         double latitude=location.getLatitude();
         double longitude=location.getLongitude();
-        etMessage.setText("Latitude:"+latitude+"\nLongitude:"+longitude);
+        etMessage.setText("https://earth.google.com/web/@"+latitude+","+longitude+
+                ",515.78526037a,34.0944109d,35y,0h,0t,0r"+"\nLatitude:"+latitude+"\nLongitude:"+longitude);
 
     }
 
@@ -512,9 +541,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener,
     }
 
     public void startService(){
-//        vibr(v);
+      // vibr(v);
         Intent serviceIntent = new Intent(this,BackService.class);
-//        serviceIntent.putExtra("name","anything to pass");
+        serviceIntent.putExtra("name","anything to pass");
         startService(serviceIntent);
     }
     public void stopService(View v){

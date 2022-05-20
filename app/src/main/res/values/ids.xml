@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="usrNm" type="id" />
+    <item name="usrPhN" type="id" />
+    <item name="dp" type="id" />
+    <item name="action_settings" type="id" />
+</resources>

@@ -6,12 +6,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.IBinder;
-import android.provider.SyncStateContract;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.view.View;
 
-import static com.example.smsreadsend.App.CHANNEL_1_ID;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+
 import static com.example.smsreadsend.App.CHANNEL_ID;
 
 public class BackService extends Service {
@@ -53,7 +51,7 @@ public class BackService extends Service {
         startForeground(4,notification);
 
         //stopSelf();
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
 
